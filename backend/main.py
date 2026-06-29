@@ -71,7 +71,7 @@ else:
 
 cors_origins = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:3000,https://your-vercel-app.vercel.app",
+    "https://eduagent-zeta.vercel.app",
 ).split(",")
 
 agent_executor = None
