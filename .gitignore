@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.venv/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Node
+node_modules/
+.next/
+out/
+
+# Env
+.env
+.env.local
+.env.production
+
+# Vercel
+.vercel
+
+# Env
+.env
+.env.local
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+postgres_data/
+
+# Pip cache (build artifact)
+.pip-cache/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

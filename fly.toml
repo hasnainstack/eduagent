@@ -1,0 +1,45 @@
+# Fly.io deployment config for EduAgent backend
+# Uses a persistent volume for SQLite so data survives restarts.
+# Secrets are injected via `fly secrets set` — NEVER in .env in the repo.
+
+app = "eduagent-backend"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  ENVIRONMENT = "production"
+  # SQLite path points to the persistent volume mount
+  SQLITE_PATH = "/data/eduagent.db"
+  LOG_LEVEL = "INFO"
+  CORS_ORIGINS = "https://your-frontend.vercel.app,https://eduagent-frontend.vercel.app"
+  AGENT_TIMEOUT_SECONDS = "30"
+
+[[mounts]]
+  source = "eduagent_data"
+  destination = "/data"
+
+[[services]]
+  internal_port = 8000
+  protocol = "tcp"
+
+  [services.concurrency]
+    type = "requests"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.ports]]
+    handlers = ["tls"]  # Auto HTTPS
+    port = 443
+
+  [[services.tcp_checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    restart_limit = 6
+
+  [[services.http_checks]]
+    interval = "30s"
+    path = "/health"
+    method = "GET"
+    timeout = "5s"

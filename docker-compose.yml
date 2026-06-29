@@ -1,0 +1,2 @@
+# SQLite-only setup — no external database needed.
+# Run `uvicorn backend.main:app` from the backend directory.
