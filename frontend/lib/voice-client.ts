@@ -9,8 +9,7 @@ type ErrorHandler = (error: string) => void;
 
 const WS_BASE =
   process.env.NEXT_PUBLIC_WS_URL ||
-  process.env.NEXT_PUBLIC_API_URL?.replace(/^http/, "ws") ||
-  "ws://localhost:8000";
+  process.env.NEXT_PUBLIC_API_URL?.replace(/^http/, "ws")!;
 
 export class VoiceClient {
   private ws: WebSocket | null = null;

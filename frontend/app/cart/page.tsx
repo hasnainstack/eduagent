@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { useRouter } from "next/navigation";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE = process.env.NEXT_PUBLIC_API_URL!;
 
 type CartItem = {
   id: number;

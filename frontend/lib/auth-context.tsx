@@ -9,7 +9,7 @@ import React, {
   type ReactNode,
 } from "react";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE = process.env.NEXT_PUBLIC_API_URL!;
 
 type User = {
   id: number;

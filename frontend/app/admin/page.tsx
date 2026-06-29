@@ -62,7 +62,7 @@ type User = {
 
 type Tab = "bookings" | "emails" | "sessions" | "courses" | "instructors" | "users";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const BASE = process.env.NEXT_PUBLIC_API_URL!;
 
 function authHeaders(token: string): Record<string, string> {
   return {

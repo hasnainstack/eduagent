@@ -90,7 +90,7 @@ export default function VoicePage() {
         try {
           setStatus("thinking");
           const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/chat`,
+            `${process.env.NEXT_PUBLIC_API_URL!}/chat`,
             {
               method: "POST",
               headers: { "Content-Type": "application/json" },
