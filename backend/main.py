@@ -327,7 +327,12 @@ async def chat(
             response="I'm taking too long to respond. Could you please try again?",
         )
     except Exception as e:
-        log.error("Agent execution error: %s", e)
+        log.error("Agent execution error: %s", e, exc_info=True)
+        try:
+            import sentry_sdk
+            sentry_sdk.capture_exception(e)
+        except ImportError:
+            pass
         return ChatResponse(
             response="I'm sorry, something went wrong. Please try again.",
         )

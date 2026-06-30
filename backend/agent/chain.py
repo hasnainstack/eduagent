@@ -24,31 +24,51 @@ log = get_logger("chain")
 # ── Helpers ────────────────────────────────────────────────────
 
 
-def _create_model():
-    """Create the chat model instance — Groq preferred, Gemini fallback."""
+def _create_models():
+    """Create chat model instances — Groq preferred, Gemini fallback.
+
+    Returns a list of (name, model) pairs in preference order.
+    Raises ValueError if no API keys are configured.
+    """
     groq_key = os.getenv("GROQ_API_KEY", "")
     gemini_key = os.getenv("GEMINI_API_KEY", "")
+
+    models = []
 
     if groq_key:
         from langchain_groq import ChatGroq
 
-        return ChatGroq(
-            model="llama-3.3-70b-versatile",
-            temperature=0.3,
-            max_tokens=384,
-            api_key=groq_key,
+        models.append(
+            (
+                "Groq Llama 3.3",
+                ChatGroq(
+                    model="llama-3.3-70b-versatile",
+                    temperature=0.3,
+                    max_tokens=384,
+                    api_key=groq_key,
+                ),
+            )
         )
-    elif gemini_key:
+
+    if gemini_key:
         from langchain_google_genai import ChatGoogleGenerativeAI
 
-        return ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
-            temperature=0.5,
-            max_tokens=512,
-            api_key=gemini_key,
+        models.append(
+            (
+                "Gemini 2.0 Flash",
+                ChatGoogleGenerativeAI(
+                    model="gemini-2.0-flash",
+                    temperature=0.5,
+                    max_tokens=512,
+                    api_key=gemini_key,
+                ),
+            )
         )
-    else:
+
+    if not models:
         raise ValueError("Set GEMINI_API_KEY or GROQ_API_KEY in your .env file.")
+
+    return models
 
 
 def _build_tool_descriptions(tools: list[BaseTool]) -> str:
@@ -168,17 +188,43 @@ def _load_session_history(session_id: str, max_pairs: int = 5) -> list:
 
 
 class NovaAgent:
-    """A simple agent that uses prompt-based tool calling."""
+    """A simple agent that uses prompt-based tool calling with model failover."""
 
-    def __init__(self, model, tools: list[BaseTool]):
-        self.model = model
+    def __init__(self, models: list[tuple[str, Any]], tools: list[BaseTool]):
+        self.models = models  # list of (name, model) pairs in preference order
         self.tools = tools
         self.tool_prompt = _build_tool_prompt(tools)
+        self._current_model_idx = 0
 
     async def _call_model(self, messages: list) -> str:
-        """Call the model with messages and return the response text."""
-        result = await self.model.ainvoke(messages)
-        return result.content or ""
+        """Call the current model with messages and return the response text.
+
+        Tries the primary model first; if it fails, falls through to the next
+        available model (if any) so a single API outage doesn't break the agent.
+        """
+        errors = []
+        for idx in range(self._current_model_idx, len(self.models)):
+            name, model = self.models[idx]
+            try:
+                result = await model.ainvoke(messages)
+                # Success — promote this model to primary for future calls
+                self._current_model_idx = idx
+                return result.content or ""
+            except Exception as e:
+                err_str = str(e)
+                log.error("Model '%s' failed: %s", name, err_str, exc_info=True)
+                errors.append(f"{name}: {err_str}")
+                try:
+                    import sentry_sdk
+                    sentry_sdk.capture_exception(e)
+                except ImportError:
+                    pass
+                continue
+
+        # All models failed — surface the collected errors
+        raise RuntimeError(
+            "All AI models failed:\n  " + "\n  ".join(errors)
+        )
 
     async def ainvoke(self, state: dict) -> dict:
         """Process messages and return final state with responses.
@@ -231,10 +277,12 @@ class NovaAgent:
 
 
 def create_agent_executor():
-    """Create and return the Nova agent."""
-    model = _create_model()
+    """Create and return the Nova agent with automatic model failover."""
+    models = _create_models()
     tools = get_all_tools()
-    return NovaAgent(model=model, tools=tools)
+    names = ", ".join(name for name, _ in models)
+    log.info("Created Nova agent with models: %s", names)
+    return NovaAgent(models=models, tools=tools)
 
 
 async def run_agent(question: str, agent, session_id: str = "", user: Optional[Any] = None) -> dict:
