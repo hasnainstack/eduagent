@@ -5,6 +5,6 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://eduagent-backend.fly.dev"
+    "NEXT_PUBLIC_API_URL": "https://eduagent-backend-sa6b.onrender.com"
   }
 }
