@@ -12,7 +12,7 @@ app = "eduagent-backend"
   # SQLite path points to the persistent volume mount
   SQLITE_PATH = "/data/eduagent.db"
   LOG_LEVEL = "INFO"
-  CORS_ORIGINS = "https://your-frontend.vercel.app,https://eduagent-frontend.vercel.app"
+  CORS_ORIGINS = "https://eduagent-zeta.vercel.app,http://localhost:3000"
   AGENT_TIMEOUT_SECONDS = "30"
 
 [[mounts]]

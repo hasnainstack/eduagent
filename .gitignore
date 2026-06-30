@@ -14,6 +14,11 @@ node_modules/
 .next/
 out/
 
+# Stale Next.js static export copied to backend (rebuild, don't commit)
+backend/static/_next/
+backend/static/index.html
+backend/static/*.html
+
 # Env
 .env
 .env.local

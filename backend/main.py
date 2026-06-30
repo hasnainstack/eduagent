@@ -74,6 +74,8 @@ cors_origins = os.getenv(
     "https://eduagent-zeta.vercel.app",
 ).split(",")
 
+log.info("CORS allowed origins: %s", cors_origins)
+
 agent_executor = None
 
 # Rate limiter
