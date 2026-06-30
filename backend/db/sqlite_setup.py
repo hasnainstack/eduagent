@@ -144,11 +144,10 @@ def seed_db():
 
         # Seed default admin user if no users exist
         if session.query(User).count() == 0:
-            from passlib.context import CryptContext
-            pwd_ctx = CryptContext(schemes=["bcrypt"], deprecated="auto")
+            import bcrypt
             admin = User(
                 email="admin@devnestacademy.com",
-                password_hash=pwd_ctx.hash("admin123"),
+                password_hash=bcrypt.hashpw(b"admin123", bcrypt.gensalt()).decode("utf-8"),
                 full_name="Admin User",
                 role="admin",
                 is_active=True,
