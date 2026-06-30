@@ -646,7 +646,12 @@ async def voice_websocket(websocket: WebSocket):
                 db_ws.commit()
                 db_ws.close()
             except Exception as e:
-                log.warning("Failed to save WS user message: %s", e)
+                log.warning("Failed to save WS user message: %s", e, exc_info=True)
+                try:
+                    import sentry_sdk
+                    sentry_sdk.capture_exception(e)
+                except ImportError:
+                    pass
 
             # Run agent with timeout
             try:
@@ -664,7 +669,12 @@ async def voice_websocket(websocket: WebSocket):
                 )
                 continue
             except Exception as e:
-                log.error("WS agent error: %s", e)
+                log.error("WS agent error: %s", e, exc_info=True)
+                try:
+                    import sentry_sdk
+                    sentry_sdk.capture_exception(e)
+                except ImportError:
+                    pass
                 await websocket.send_json(
                     {
                         "type": "error",
@@ -686,7 +696,12 @@ async def voice_websocket(websocket: WebSocket):
                 db_ws2.commit()
                 db_ws2.close()
             except Exception as e:
-                log.warning("Failed to save WS AI message: %s", e)
+                log.warning("Failed to save WS AI message: %s", e, exc_info=True)
+                try:
+                    import sentry_sdk
+                    sentry_sdk.capture_exception(e)
+                except ImportError:
+                    pass
 
             # Log email if booking was created
             if result["booking_created"] and result["booking_details"]:
@@ -724,11 +739,16 @@ async def voice_websocket(websocket: WebSocket):
     except WebSocketDisconnect:
         log.info("WebSocket client disconnected")
     except Exception as e:
-        log.error("WebSocket error: %s", e)
+        log.error("WebSocket error: %s", e, exc_info=True)
         try:
-            await websocket.send_json({"type": "error", "text": str(e)})
-        except Exception:
+            import sentry_sdk
+            sentry_sdk.capture_exception(e)
+        except ImportError:
             pass
+        try:
+            await websocket.send_json({"type": "error", "text": "Internal server error"})
+        except Exception:
+            pass  # WS already closed — ignore secondary failure
 
 
 # ── SPA Catch-all (must be last — serves frontend static build) ──

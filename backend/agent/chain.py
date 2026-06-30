@@ -159,7 +159,8 @@ def _load_session_history(session_id: str, max_pairs: int = 5) -> list:
             return messages
         finally:
             db.close()
-    except Exception:
+    except Exception as e:
+        log.warning("Failed to load session history: %s", e, exc_info=True)
         return []
 
 
@@ -319,7 +320,12 @@ async def run_agent(question: str, agent, session_id: str = "", user: Optional[A
         }
     except Exception as e:
         err_str = str(e)
-        log.error("Agent error: %s: %.200s", type(e).__name__, err_str)
+        log.error("Agent error: %s: %.200s", type(e).__name__, err_str, exc_info=True)
+        try:
+            import sentry_sdk
+            sentry_sdk.capture_exception(e)
+        except ImportError:
+            pass
         if "429" in err_str or "rate limit" in err_str.lower() or "quota" in err_str.lower():
             return {
                 "response": "I'm currently experiencing high demand and my API rate limit has been reached. Please wait a moment and try again! In the meantime, you can explore our courses at devnestacademy.com.",

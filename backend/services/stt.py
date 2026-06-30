@@ -51,5 +51,10 @@ async def transcribe_audio(audio_bytes: bytes, mime_type: str = "audio/webm") ->
         return transcript.strip()
 
     except Exception as e:
-        log.error("Deepgram STT error: %s", e)
+        log.error("Deepgram STT error: %s", e, exc_info=True)
+        try:
+            import sentry_sdk
+            sentry_sdk.capture_exception(e)
+        except ImportError:
+            pass
         return ""

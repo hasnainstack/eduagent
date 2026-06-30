@@ -4,6 +4,7 @@ Uses gTTS (Google Text-to-Speech) as the primary provider — free, no API key n
 Falls back to ElevenLabs if a valid paid-plan API key is configured.
 """
 
+import asyncio
 import io
 import os
 from typing import Optional
@@ -54,14 +55,19 @@ async def _synthesize_gtts(text: str) -> Optional[bytes]:
     try:
         tts = gTTS(text=text, lang="en", slow=False)
         buf = io.BytesIO()
-        # gTTS.write_to_fp is synchronous and uses requests under the hood
-        tts.write_to_fp(buf)
+        # Run the synchronous gTTS network call in a thread pool to avoid blocking the event loop
+        await asyncio.to_thread(tts.write_to_fp, buf)
         buf.seek(0)
         audio_bytes = buf.read()
         log.info("gTTS generated %d bytes", len(audio_bytes))
         return audio_bytes
     except Exception as e:
-        log.error("gTTS error: %s", e)
+        log.error("gTTS error: %s", e, exc_info=True)
+        try:
+            import sentry_sdk
+            sentry_sdk.capture_exception(e)
+        except ImportError:
+            pass
         return None
 
 
@@ -97,5 +103,10 @@ async def _synthesize_elevenlabs(text: str) -> Optional[bytes]:
                 log.error("ElevenLabs error (HTTP %d): %s", response.status_code, msg)
                 return None
     except Exception as e:
-        log.error("ElevenLabs request error: %s", e)
+        log.error("ElevenLabs request error: %s", e, exc_info=True)
+        try:
+            import sentry_sdk
+            sentry_sdk.capture_exception(e)
+        except ImportError:
+            pass
         return None
