@@ -1,6 +1,6 @@
 """Booking store for course enrollments.
 
-Writes to both SQLite (persistent) and in-memory cache (fast access).
+Writes to both PostgreSQL/SQLite (persistent) and in-memory cache (fast access).
 """
 
 from dataclasses import dataclass
@@ -36,8 +36,8 @@ _counter: int = 0
 _last_created_id: Optional[str] = None
 
 
-def load_from_sqlite():
-    """Load bookings from SQLite into memory at startup."""
+def load_from_database():
+    """Load bookings from the database into memory at startup."""
     try:
         from backend.db.sqlite_setup import Booking as SQLBooking, get_session
         db = get_session()
@@ -58,15 +58,15 @@ def load_from_sqlite():
                 _bookings[r.booking_id] = b
             global _counter
             _counter = len(records)
-            log.info("Loaded %d bookings from SQLite", len(records))
+            log.info("Loaded %d bookings from database", len(records))
         finally:
             db.close()
     except Exception as e:
-        log.warning("Could not load bookings from SQLite (non-fatal): %s", e)
+        log.warning("Could not load bookings from database (non-fatal): %s", e)
 
 
-def _save_to_sqlite(booking: Booking):
-    """Persist a booking to SQLite."""
+def _save_to_database(booking: Booking):
+    """Persist a booking to PostgreSQL/SQLite."""
     try:
         from backend.db.sqlite_setup import Booking as SQLBooking, get_session
         db = get_session()
@@ -86,13 +86,13 @@ def _save_to_sqlite(booking: Booking):
         finally:
             db.close()
     except Exception as e:
-        log.warning("Could not persist booking to SQLite (non-fatal): %s", e)
+        log.warning("Could not persist booking to database (non-fatal): %s", e)
 
 
 def generate_booking_id() -> str:
     global _counter
     if _counter == 0:
-        # Initialise counter from SQLite to avoid collisions on restart
+        # Initialise counter from database to avoid collisions on restart
         try:
             from backend.db.sqlite_setup import Booking as SQLBooking, get_session
             db = get_session()
@@ -104,14 +104,14 @@ def generate_booking_id() -> str:
             finally:
                 db.close()
         except Exception as e:
-            log.warning("Could not initialise booking counter from SQLite: %s", e)
+            log.warning("Could not initialise booking counter from database: %s", e)
     _counter += 1
     ts = datetime.now(timezone.utc).strftime("%y%m%d")
     return f"DN-{ts}-{_counter:04d}"
 
 
 def _existing_enrollment(email: str, exclude_id: Optional[str] = None) -> Optional[Booking]:
-    """Check if this email already has a confirmed booking (across memory + SQLite).
+    """Check if this email already has a confirmed booking (across memory + database).
 
     Returns the existing booking if found, None otherwise.
     """
@@ -121,7 +121,7 @@ def _existing_enrollment(email: str, exclude_id: Optional[str] = None) -> Option
             if exclude_id and b.booking_id == exclude_id:
                 continue
             return b
-    # Then check SQLite for any that might not be in memory yet
+    # Then check database for any that might not be in memory yet
     try:
         from backend.db.sqlite_setup import Booking as SQLBooking, get_session
         db = get_session()
@@ -148,7 +148,7 @@ def _existing_enrollment(email: str, exclude_id: Optional[str] = None) -> Option
         finally:
             db.close()
     except Exception as e:
-        log.warning("Could not check existing enrollment in SQLite: %s", e)
+        log.warning("Could not check existing enrollment in database: %s", e)
     return None
 
 
@@ -158,7 +158,7 @@ def create_booking(
     course_slug: str,
     payment_option: str = "discounted",
 ) -> Booking:
-    """Create a new booking. Stores in memory + SQLite.
+    """Create a new booking. Stores in memory + database.
 
     Raises ValueError if this email already has a confirmed booking
     (one course per student policy).
@@ -207,8 +207,8 @@ def create_booking(
     global _last_created_id
     _last_created_id = booking.booking_id
 
-    # Persist to SQLite in background
-    _save_to_sqlite(booking)
+    # Persist to database in background
+    _save_to_database(booking)
 
     return booking
 
@@ -225,7 +225,7 @@ def cancel_booking(booking_id: str) -> Optional[Booking]:
     booking = _bookings.get(booking_id)
     if booking:
         booking.status = "cancelled"
-        # Update SQLite
+        # Update database
         try:
             from backend.db.sqlite_setup import Booking as SQLBooking, get_session
             db = get_session()
@@ -235,7 +235,7 @@ def cancel_booking(booking_id: str) -> Optional[Booking]:
             finally:
                 db.close()
         except Exception as e:
-            log.warning("Failed to update booking status in SQLite: %s", e)
+            log.warning("Failed to update booking status in database: %s", e)
     return booking
 
 
@@ -273,4 +273,4 @@ def reset_store():
         finally:
             db.close()
     except Exception as e:
-        log.warning("Failed to clear bookings from SQLite: %s", e)
+        log.warning("Failed to clear bookings from database: %s", e)

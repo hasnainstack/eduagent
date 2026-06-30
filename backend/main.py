@@ -90,16 +90,16 @@ async def lifespan(app: FastAPI):
     # Validate env on startup
     validate_env()
 
-    log.info("Initialising SQLite database...")
+    log.info("Initialising database...")
     try:
         init_db()
         seed_db()
-        from backend.services.booking_store import load_from_sqlite
+        from backend.services.booking_store import load_from_database
 
-        load_from_sqlite()
-        log.info("SQLite database ready.")
+        load_from_database()
+        log.info("Database ready.")
     except Exception as e:
-        log.warning("SQLite init warning (non-fatal): %s", e)
+        log.warning("Database init warning (non-fatal): %s", e)
 
     log.info("Initialising Nova agent...")
     try:
