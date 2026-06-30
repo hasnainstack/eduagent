@@ -11,19 +11,52 @@ from pathlib import Path
 # Ensure the project root is on the path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-# Set test env vars before importing the app
+# Set test env vars BEFORE importing the app (so they are read at module level)
 os.environ.setdefault("JWT_SECRET", "test-secret-key-not-for-production")
 os.environ.setdefault("ENVIRONMENT", "test")
 os.environ.setdefault("CORS_ORIGINS", "http://localhost:3000")
+# Force SQLite for CI — the .env file is not present in CI and should never
+# be tracked in git. Without this override, if DATABASE_URL leaks in via
+# the environment, CI would try connecting to a remote PostgreSQL instance.
+os.environ.setdefault("DATABASE_URL", "")
 
 from fastapi.testclient import TestClient
 
 from backend.main import app
+from backend.db.sqlite_setup import init_db, seed_db
+
+# ── Test database setup ──────────────────────────────────────────
+# The app's lifespan startup won't execute because TestClient is not
+# used as a context manager here (/enter/exit). We must init the DB
+# explicitly so the SQLite tables exist before any test queries them.
+init_db()
+seed_db()
 
 # Disable rate limiter for tests (slowapi doesn't work with TestClient)
 app.state.limiter.enabled = False
 
 client = TestClient(app)
+
+
+# ── Test helpers ─────────────────────────────────────────────────
+
+
+def _make_token(email: str = "admin@devnestacademy.com") -> str:
+    """Return a valid Bearer token for the given user email."""
+    from backend.db.sqlite_setup import User as UserModel, get_session
+    from backend.auth.jwt_handler import create_access_token
+
+    db = get_session()
+    user = db.query(UserModel).filter(UserModel.email == email).first()
+    db.close()
+    if user is None:
+        raise RuntimeError(f"Test user {email} not found — has seed_db() run?")
+    return create_access_token(user.id, user.role)
+
+
+def _auth_header(email: str = "admin@devnestacademy.com") -> dict:
+    """Return Authorization header dict for the given user."""
+    return {"Authorization": f"Bearer {_make_token(email)}"}
 
 
 class TestHealth:
@@ -87,6 +120,7 @@ class TestEnroll:
     def test_enroll_nonexistent_course(self):
         resp = client.post(
             "/enroll",
+            headers=_auth_header(),
             json={
                 "student_name": "Test User",
                 "email": "test@example.com",
@@ -100,6 +134,7 @@ class TestEnroll:
     def test_enroll_invalid_email(self):
         resp = client.post(
             "/enroll",
+            headers=_auth_header(),
             json={
                 "student_name": "Test User",
                 "email": "not-an-email",
