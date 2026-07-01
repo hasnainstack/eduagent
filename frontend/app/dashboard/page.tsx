@@ -53,26 +53,28 @@ export default function DashboardPage() {
   return (
     <main className="min-h-screen bg-gray-50">
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Link href="/" className="text-2xl">🦉</Link>
-            <div>
-              <h1 className="text-xl font-bold text-brand-900">My Dashboard</h1>
-              <p className="text-xs text-gray-500">{user?.full_name} ({user?.email})</p>
+        <div className="max-w-5xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <Link href="/" className="text-xl sm:text-2xl shrink-0">🦉</Link>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-bold text-brand-900 truncate">My Dashboard</h1>
+              <p className="text-xs text-gray-500 truncate hidden sm:block">{user?.full_name} ({user?.email})</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Link href="/cart" className="px-4 py-2 text-sm rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-700 transition-colors">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
+            <Link href="/cart" className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-700 transition-colors">
               🛒 Cart
             </Link>
-            <Link href="/" className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors">
-              ← Home
+            <Link href="/" className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors">
+              <span className="hidden sm:inline">← Home</span>
+              <span className="sm:hidden">🏠</span>
             </Link>
             <button
               onClick={() => { logout(); router.push("/"); }}
-              className="px-4 py-2 text-sm rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg bg-red-50 hover:bg-red-100 text-red-600 transition-colors"
             >
-              Logout
+              <span className="hidden sm:inline">Logout</span>
+              <span className="sm:hidden">🚪</span>
             </button>
           </div>
         </div>

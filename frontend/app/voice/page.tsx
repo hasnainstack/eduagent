@@ -127,9 +127,9 @@ export default function VoicePage() {
       </header>
 
       {/* Status bar */}
-      <div className="flex items-center justify-center gap-3 mb-4">
+      <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 px-4">
         <span
-          className={`w-3 h-3 rounded-full ${
+          className={`shrink-0 w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full ${
             status === "disconnected"
               ? "bg-gray-400"
               : status === "connected"
@@ -141,7 +141,7 @@ export default function VoicePage() {
               : "bg-brand-500"
           }`}
         />
-        <span className="text-sm font-medium text-gray-700 capitalize">
+        <span className="text-xs sm:text-sm font-medium text-gray-700 truncate max-w-[260px] sm:max-w-none">
           {status === "disconnected"
             ? "Disconnected"
             : status === "connected"
@@ -198,19 +198,19 @@ export default function VoicePage() {
         )}
 
         {status === "disconnected" || status === "connected" ? (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
             <button
               onClick={startVoice}
-              className="px-8 py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow-lg shadow-brand-500/30 transition-all duration-200 hover:shadow-xl"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-lg shadow-brand-500/30 transition-all duration-200 hover:shadow-xl"
             >
               🎤 Start Voice Conversation
             </button>
             <p className="text-xs text-gray-400">
               Requires microphone access. Chrome recommended.
             </p>
-            <div className="flex items-center gap-3 w-full">
+            <div className="flex items-center gap-2 sm:gap-3 w-full">
               <span className="flex-1 h-px bg-brand-200" />
-              <span className="text-xs text-gray-400">OR type below</span>
+              <span className="text-xs text-gray-400 whitespace-nowrap">OR type below</span>
               <span className="flex-1 h-px bg-brand-200" />
             </div>
             <form onSubmit={handleSubmit} className="w-full flex gap-2">
@@ -219,25 +219,25 @@ export default function VoicePage() {
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 rounded-full border border-brand-200 bg-white px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 shadow-sm"
+                className="flex-1 rounded-full border border-brand-200 bg-white px-4 sm:px-5 py-2.5 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 shadow-sm"
               />
               <button
                 type="submit"
                 disabled={!textInput.trim()}
-                className="rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white px-6 py-3 text-sm font-semibold shadow-md transition-all"
+                className="rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold shadow-md transition-all shrink-0"
               >
                 Send
               </button>
             </form>
           </div>
         ) : (
-          <div className="flex flex-col items-center gap-4">
+          <div className="flex flex-col items-center gap-3 sm:gap-4">
             <button
               onClick={stopVoice}
-              className="w-16 h-16 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg shadow-red-500/30 transition-all duration-200"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-500 hover:bg-red-600 text-white flex items-center justify-center shadow-lg shadow-red-500/30 transition-all duration-200"
               aria-label="End conversation"
             >
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
@@ -248,12 +248,12 @@ export default function VoicePage() {
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
                 placeholder="Or type instead..."
-                className="flex-1 rounded-full border border-brand-200 bg-white px-5 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 shadow-sm"
+                className="flex-1 rounded-full border border-brand-200 bg-white px-4 sm:px-5 py-2.5 sm:py-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-300 shadow-sm"
               />
               <button
                 type="submit"
                 disabled={!textInput.trim()}
-                className="rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white px-6 py-3 text-sm font-semibold shadow-md transition-all"
+                className="rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300 text-white px-4 sm:px-6 py-2.5 sm:py-3 text-sm font-semibold shadow-md transition-all shrink-0"
               >
                 Send
               </button>

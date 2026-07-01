@@ -374,20 +374,20 @@ export default function VoicePage() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-between min-h-screen p-4 sm:p-8 bg-white">
+    <main className="flex flex-col items-center justify-between min-h-screen px-3 sm:p-8 bg-white">
       {/* Header */}
-      <header className="text-center">
-        <h1 className="text-3xl sm:text-4xl font-bold text-brand-900 mb-2">
+      <header className="text-center pt-3 sm:pt-0">
+        <h1 className="text-xl sm:text-4xl font-bold text-brand-900 mb-0.5 sm:mb-2">
           DevNest Academy
         </h1>
-        <p className="text-lg text-brand-600 font-medium">
+        <p className="text-sm sm:text-lg text-brand-600 font-medium">
           Nova — AI Admissions Assistant
         </p>
       </header>
 
       {/* Chat Area */}
-      <section className="flex-1 w-full max-w-2xl overflow-y-auto my-6 px-2">
-        <div ref={transcriptRef} className="space-y-1 max-h-[60vh] overflow-y-auto scrollbar-hide pr-2">
+      <section className="flex-1 w-full max-w-2xl overflow-y-auto my-3 sm:my-6 px-0 sm:px-2">
+        <div ref={transcriptRef} className="space-y-1 max-h-[60vh] overflow-y-auto scrollbar-hide pr-1 sm:pr-2">
           <AnimatePresence>
             {messages.map((m, i) => (
               <motion.div
@@ -622,7 +622,7 @@ export default function VoicePage() {
       )}
 
       {/* Text input + Controls */}
-      <footer className="flex flex-col items-center gap-3 pb-4 w-full max-w-2xl">
+      <footer className="flex flex-col items-center gap-2 sm:gap-3 pb-2 sm:pb-4 w-full max-w-2xl">
         {/* Text input bar */}
         <form onSubmit={handleTextSubmit} className="w-full">
           <div className="flex items-center gap-2">
@@ -633,7 +633,7 @@ export default function VoicePage() {
               onChange={(e) => setTextInput(e.target.value)}
               placeholder="Type a message... (or use the mic)"
               disabled={status === "thinking"}
-              className="flex-1 rounded-full border border-brand-200 bg-white px-5 py-3 text-sm
+              className="flex-1 rounded-full border border-brand-200 bg-white px-4 sm:px-5 py-2.5 sm:py-3 text-sm
                          text-gray-800 placeholder-gray-400
                          focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-brand-400
                          disabled:opacity-50 disabled:cursor-not-allowed
@@ -645,11 +645,11 @@ export default function VoicePage() {
               whileTap={{ scale: 0.95 }}
               disabled={!textInput.trim() || status === "thinking"}
               className="rounded-full bg-brand-600 hover:bg-brand-700 disabled:bg-brand-300
-                         text-white w-11 h-11 flex items-center justify-center
+                         text-white w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center
                          transition-all duration-200 shadow-md flex-shrink-0"
               aria-label="Send message"
             >
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
               </svg>
             </motion.button>
@@ -657,7 +657,7 @@ export default function VoicePage() {
         </form>
 
         {/* Divider */}
-        <div className="flex items-center gap-3 w-full">
+        <div className="flex items-center gap-2 sm:gap-3 w-full">
           <span className="flex-1 h-px bg-brand-100" />
           <span className="text-xs text-gray-400 font-medium">OR</span>
           <span className="flex-1 h-px bg-brand-100" />
@@ -669,23 +669,21 @@ export default function VoicePage() {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.97 }}
               onClick={startCall}
-              className="px-8 py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow-lg shadow-brand-500/30 transition-all duration-200"
+              className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-lg shadow-brand-500/30 transition-all duration-200"
             >
               Start Talking
             </motion.button>
             {user && (
-              <div className="flex items-center gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.04 }}
-                  whileTap={{ scale: 0.96 }}
-                  onClick={() => { setShowBookingForm(true); setError(""); }}
-                  className="px-4 py-2 rounded-xl bg-white text-brand-600 text-sm font-medium
-                             border border-brand-200 hover:border-brand-300 hover:bg-brand-50
-                             transition-all duration-200 shadow-sm"
-                >
-                  Enroll Now
-                </motion.button>
-              </div>
+              <motion.button
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.96 }}
+                onClick={() => { setShowBookingForm(true); setError(""); }}
+                className="w-full sm:w-auto px-4 py-2 rounded-xl bg-white text-brand-600 text-sm font-medium
+                           border border-brand-200 hover:border-brand-300 hover:bg-brand-50
+                           transition-all duration-200 shadow-sm"
+              >
+                Enroll Now
+              </motion.button>
             )}
             <p className="text-xs text-gray-400 text-center max-w-xs">
               Ask me about courses, fees, scholarships, or admissions.
@@ -694,7 +692,7 @@ export default function VoicePage() {
         ) : (
           <>
             {/* Status badge */}
-            <div className="flex items-center gap-2 text-sm font-medium text-brand-600">
+            <div className="flex items-center gap-2 text-xs sm:text-sm font-medium text-brand-600">
               {status === "listening" && audioActivity && (
                 <span className="flex items-center gap-0.5 h-4">
                   <span className="w-0.5 bg-brand-500 rounded-full h-2 animate-pulse" />
@@ -708,12 +706,12 @@ export default function VoicePage() {
             </div>
 
             {/* Mic + End buttons */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6">
               <motion.button
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleMicClick}
-                className={`w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300
+                className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center transition-all duration-300
                   ${status === "listening"
                     ? "bg-red-500 hover:bg-red-600 ring-4 ring-red-300 animate-pulse shadow-lg shadow-red-500/30"
                     : status === "thinking"
@@ -723,7 +721,7 @@ export default function VoicePage() {
                 aria-label={status === "listening" ? "Stop recording" : "Start recording"}
                 disabled={status === "thinking"}
               >
-                <svg className="w-8 h-8 text-white drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-6 h-6 sm:w-8 sm:h-8 text-white drop-shadow-lg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   {status === "thinking" ? (
                     <path strokeLinecap="round" strokeLinejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                   ) : status === "listening" ? (
@@ -738,10 +736,10 @@ export default function VoicePage() {
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={endCall}
-                className="w-14 h-14 rounded-full flex items-center justify-center bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all duration-200"
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center bg-red-500 hover:bg-red-600 shadow-lg shadow-red-500/30 transition-all duration-200"
                 aria-label="End call"
               >
-                <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <svg className="w-5 h-5 sm:w-6 sm:h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
                 </svg>
               </motion.button>

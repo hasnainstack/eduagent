@@ -146,11 +146,19 @@ const FAQS = [
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const { user, token, logout, isAdmin } = useAuth();
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Close mobile menu on route change or resize to desktop
+  useEffect(() => {
+    const onResize = () => { if (window.innerWidth >= 640) setMobileOpen(false); };
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   return (
@@ -162,40 +170,67 @@ function Navbar() {
           <span className="text-2xl">🦉</span>
           <span className="font-bold text-lg text-brand-900">DevNest</span>
         </Link>
+
+        {/* Desktop nav links */}
         <div className="hidden sm:flex items-center gap-6">
           <a href="#courses" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">Courses</a>
           <a href="#about" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">Why DevNest</a>
           <a href="#faq" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">FAQ</a>
         </div>
-        <div className="flex items-center gap-3">
+
+        {/* Desktop right side */}
+        <div className="hidden sm:flex items-center gap-3">
           {user ? (
             <>
               <Link href="/cart" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">Cart</Link>
               <Link href="/dashboard" className="text-sm text-gray-600 hover:text-brand-600 transition-colors">Dashboard</Link>
               {isAdmin && <Link href="/admin" className="text-sm text-brand-600 font-semibold hover:text-brand-700 transition-colors">Admin</Link>}
-              <button
-                onClick={logout}
-                className="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 transition-colors"
-              >
-                Logout
-              </button>
+              <button onClick={logout} className="px-3 py-1.5 text-sm text-red-600 hover:text-red-700 transition-colors">Logout</button>
             </>
           ) : (
-            <Link
-              href="/login"
-              className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors"
-            >
-              Login
-            </Link>
+            <Link href="/login" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors">Login</Link>
           )}
-          <Link
-            href="/chat"
-            className="px-5 py-2 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-lg shadow-brand-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-brand-500/30"
-          >
-            Chat with Nova
-          </Link>
+          <Link href="/chat" className="px-5 py-2 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold shadow-lg shadow-brand-500/25 transition-all duration-200 hover:shadow-xl hover:shadow-brand-500/30">Chat with Nova</Link>
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          onClick={() => setMobileOpen(!mobileOpen)}
+          className="sm:hidden p-2 rounded-lg text-gray-600 hover:text-brand-600 hover:bg-brand-50 transition-colors"
+          aria-label="Toggle menu"
+        >
+          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            {mobileOpen ? (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            ) : (
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+            )}
+          </svg>
+        </button>
       </div>
+
+      {/* Mobile menu dropdown */}
+      {mobileOpen && (
+        <div className="sm:hidden bg-white/95 backdrop-blur-md border-t border-brand-100 shadow-lg">
+          <div className="px-4 py-4 space-y-3">
+            <a href="#courses" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-brand-600 py-2">Courses</a>
+            <a href="#about" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-brand-600 py-2">Why DevNest</a>
+            <a href="#faq" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-brand-600 py-2">FAQ</a>
+            <hr className="border-brand-100" />
+            {user ? (
+              <>
+                <Link href="/cart" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-brand-600 py-2">Cart</Link>
+                <Link href="/dashboard" onClick={() => setMobileOpen(false)} className="block text-sm text-gray-600 hover:text-brand-600 py-2">Dashboard</Link>
+                {isAdmin && <Link href="/admin" onClick={() => setMobileOpen(false)} className="block text-sm text-brand-600 font-semibold py-2">Admin</Link>}
+                <button onClick={() => { logout(); setMobileOpen(false); }} className="block text-sm text-red-600 py-2">Logout</button>
+              </>
+            ) : (
+              <Link href="/login" onClick={() => setMobileOpen(false)} className="block text-sm font-medium text-brand-600 py-2">Login</Link>
+            )}
+            <Link href="/chat" onClick={() => setMobileOpen(false)} className="block w-full text-center px-4 py-2.5 rounded-full bg-brand-600 hover:bg-brand-700 text-white text-sm font-semibold">Chat with Nova</Link>
+          </div>
+        </div>
+      )}
     </nav>
   );
 }
@@ -204,10 +239,10 @@ function FloatingChatButton() {
   return (
     <Link
       href="/chat"
-      className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-xl shadow-brand-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-2xl hover:shadow-brand-500/40"
+      className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-40 w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-xl shadow-brand-500/30 flex items-center justify-center transition-all duration-200 hover:scale-110 hover:shadow-2xl hover:shadow-brand-500/40"
       aria-label="Chat with Nova"
     >
-      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
       </svg>
     </Link>
@@ -225,7 +260,7 @@ function Hero() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full bg-brand-200/30 blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center pt-24 pb-16">
+      <div className="relative z-10 max-w-4xl mx-auto px-4 text-center pt-20 sm:pt-24 pb-12 sm:pb-16">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-brand-100 text-brand-700 text-xs font-medium mb-8">
             Now accepting applications for Summer 2026 cohorts
         </div>
@@ -239,25 +274,26 @@ function Hero() {
           DevNest Academy offers industry-driven tech courses with live mentorship,
           real-world projects, and career support. From beginner to job-ready in weeks, not years.
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
           <Link
             href="/chat"
-            className="px-8 py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg shadow-xl shadow-brand-500/30 transition-all duration-200 hover:shadow-2xl hover:shadow-brand-500/40 hover:-translate-y-0.5"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-base sm:text-lg shadow-xl shadow-brand-500/30 transition-all duration-200 hover:shadow-2xl hover:shadow-brand-500/40 hover:-translate-y-0.5"
           >
-            <MessageCircle className="w-5 h-5" /> Talk to Nova — Your AI Advisor
+            <MessageCircle className="w-5 h-5 shrink-0" />
+            <span>Talk to Nova</span>
           </Link>
           <a
             href="#courses"
-            className="px-8 py-4 rounded-2xl bg-white border-2 border-brand-200 hover:border-brand-400 text-brand-700 font-semibold text-lg transition-all duration-200 hover:-translate-y-0.5"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-6 sm:px-8 py-3 sm:py-4 rounded-2xl bg-white border-2 border-brand-200 hover:border-brand-400 text-brand-700 font-semibold text-base sm:text-lg transition-all duration-200 hover:-translate-y-0.5"
           >
             Browse Courses
           </a>
         </div>
-        <div className="mt-12 flex items-center justify-center gap-8 text-sm text-gray-400">
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-x-8 gap-y-2 text-sm text-gray-400">
           <span>No prior experience needed</span>
-          <span className="hidden sm:inline">·</span>
-          <span className="hidden sm:inline">Scholarships available</span>
-          <span className="hidden sm:inline">·</span>
+          <span className="hidden sm:inline text-gray-300">·</span>
+          <span>Scholarships available</span>
+          <span className="hidden sm:inline text-gray-300">·</span>
           <span>Fully online</span>
         </div>
       </div>

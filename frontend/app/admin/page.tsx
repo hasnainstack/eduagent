@@ -357,43 +357,47 @@ export default function AdminPage() {
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">🦉</span>
-            <div>
-              <h1 className="text-xl font-bold text-brand-900">Admin Dashboard</h1>
-              {user && <p className="text-xs text-gray-500">{user.full_name} ({user.email})</p>}
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <span className="text-xl sm:text-2xl shrink-0">🦉</span>
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-bold text-brand-900 truncate">Admin Dashboard</h1>
+              {user && <p className="text-xs text-gray-500 truncate hidden sm:block">{user.full_name} ({user.email})</p>}
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <button
               onClick={fetchData}
-              className="px-4 py-2 text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition-colors"
+              title="Refresh"
             >
-              🔄 Refresh
+              <span className="hidden sm:inline">🔄 Refresh</span>
+              <span className="sm:hidden">🔄</span>
             </button>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 text-sm rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 transition-colors"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 transition-colors"
             >
-              🚪 Logout
+              <span className="hidden sm:inline">🚪 Logout</span>
+              <span className="sm:hidden">🚪</span>
             </button>
             <a
               href="/"
-              className="px-4 py-2 text-sm rounded-lg bg-brand-600 hover:bg-brand-700 text-white transition-colors"
+              className="px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm rounded-lg bg-brand-600 hover:bg-brand-700 text-white transition-colors"
             >
-              ← Back to Site
+              <span className="hidden sm:inline">← Back to Site</span>
+              <span className="sm:hidden">←</span>
             </a>
           </div>
         </div>
         {/* Tabs */}
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="flex gap-1 -mb-px overflow-x-auto">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4">
+          <div className="flex gap-1 -mb-px overflow-x-auto scrollbar-hide">
             {tabs.map((t) => (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                className={`px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                   tab === t.key
                     ? "border-brand-600 text-brand-700"
                     : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"

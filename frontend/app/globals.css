@@ -48,3 +48,26 @@ body {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(0.8); }
 }
+
+/* Safe area bottom padding for mobile (notch phones) */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Prevent horizontal overflow on small screens */
+img, svg, video, canvas {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Better tap targets on mobile */
+@media (max-width: 640px) {
+  button, a, input, select {
+    min-height: 44px;
+  }
+  input, select {
+    font-size: 16px !important; /* prevents iOS zoom on focus */
+  }
+}
